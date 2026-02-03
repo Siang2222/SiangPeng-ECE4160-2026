@@ -1,10 +1,9 @@
 <style>
-/* 固定左侧导航 */
 #jump-nav {
   position: fixed;
-  top: 20px;     /* 离顶部 20px */
-  left: 10px;    /* 离左边 10px */
-  width: 120px;  /* 可调宽度 */
+  top: 240px;    
+  left: 120px;   
+  width: 240px;  
   font-family: sans-serif;
   background-color: #f8f8f8;
   padding: 10px;
@@ -36,11 +35,6 @@
 Hi! I'm **Siang Peng**, a senior in ECE at Cornell.<br>
 This page will be used to share my coursework in Fast Robots. I hope this page can help future students better understand the requirements of these labs and provide some guidance.<br>
 > ⚠️ **Note:** I am using **Windows 11**. If your system is different, check what applies to your system.
-
-**Jump to:**
-- [Lab 1](#lab1)
-- [Lab 2](#lab2)
-- [Lab 3](#lab3)
 
 # Lab 1: The Artemis Board and Bluetooth {#lab1}
 
