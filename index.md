@@ -22,4 +22,5 @@ This page will be used to share my coursework in Fast Robots. I hope this page c
 
 ![Fig.1](images/1.png)
 
-3. Paste the following URL in a separate line (if you have previously added other files) and save changes:  
+3. Paste the following URL in a separate line (if you have previously added other files) and save changes:
+> https://raw.githubusercontent.com/sparkfun/Arduino_Apollo3/main/package_sparkfun_apollo3_index.json
