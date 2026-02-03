@@ -2,7 +2,7 @@
 #jump-nav {
   position: fixed;
   top: 240px;    
-  left: 120px;   
+  left: 60px;   
   width: 360px;  
   font-family: sans-serif;
   background-color: #f8f8f8;
