@@ -64,11 +64,11 @@ First, I hooked the Artemis board up to my laptop. Then I clicked on port select
 ### Task 2: Make the built-in LED on board blink
 Click **File → Examples → 01.Basics → Blink**  
 
+A new Arduino IDE window pops up. Make sure the correct board and port are selected, then click **Upload**.  
+
 <p align="center">
   <img src="images/lab1/6.png" width="400">
 </p>
-
-A new Arduino IDE window pops up. Make sure the correct board and port are selected, then click **Upload**.  
 
 Now you should be able to see the built-in LED on board blinking blue.  
 
@@ -79,10 +79,6 @@ Now you should be able to see the built-in LED on board blinking blue.
     <source src="videos/video1.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
-</p>
-
-<p align="center">
-  <img src="images/lab1/7.png" width="400">
 </p>
 
 > If not, check if you have the correct board and port selected.
