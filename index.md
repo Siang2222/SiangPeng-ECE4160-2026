@@ -285,7 +285,7 @@ For example, my folder is called `FR`. Right-click inside this folder and open t
 
 16. Create a new code cell right below and type in the following two lines:
 
-    ```python
+    ```bash
     from uuid import uuid4
     uuid4()
     ```
@@ -323,7 +323,7 @@ For example, my folder is called `FR`. Right-click inside this folder and open t
 ## Tasks 1: send and receive string
 Activate the virtual environment and start Jupyter Lab. In ble_arduino.ino, locate case ECHO: and observe that the text sent from Python is already stored in char_arr. By adding Serial.print / Serial.println, the goal could be easily achieved. Then, rerun Prelab Step 20 in demo.ipynb to reconnect to the Artemis board. Finally, run
 
-    ```python
+    ```bash
     ble.send_command(CMD.ECHO, "HIHELLO")
     ```
 
@@ -338,7 +338,7 @@ in **demo.ipynb; you should see the output in the Arduino IDE Serial Monitor.**
 ## Tasks 2: SEND_THREE_FLOATS
 Look at case SEND_TWO_INTS:; this makes it easy to understand how to write SEND_THREE_FLOATS. The only difference is that the local variables we define should be float instead of int. Finally, reconnect to the Artemis board， and run
 
-    ```python
+    ```bash
     ble.send_command(CMD.SEND_THREE_FLOATS, "2.2|3.3|4.4")
     ```
 
@@ -355,7 +355,7 @@ Note that neither cmd_types.py nor ble_arduino.ino currently include the GET_TIM
 
 In cmd_types.py, add three lines:
 
-    ```python
+    ```bash
     GET_TIME_MILLIS = 6
     SEND_TIME_DATA = 7
     GET_TEMP_READINGS = 8
@@ -367,7 +367,7 @@ In cmd_types.py, add three lines:
 
 In ble_arduino.ino, locate the enum CommandTypes and add:
 
-    ```cpp
+    ```bash
     GET_TIME_MILLIS,
     SEND_TIME_DATA,
     GET_TEMP_READINGS,
@@ -384,7 +384,7 @@ In case PING, you can see the code pattern to use and call millis(). Following t
 
 Upload and reconnect, in demo.ipynb, create a new cell block and enter
 
-    ```python
+    ```bash
     ble.send_command(CMD.GET_TIME_MILLIS, "")
     s = ble.receive_string(ble.uuid['RX_STRING'])
     print(s)
