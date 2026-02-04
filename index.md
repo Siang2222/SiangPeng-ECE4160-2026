@@ -314,3 +314,145 @@ For example, my folder is called `FR`. Right-click inside this folder and open t
   <img src="images/lab1/18.png" width="400">
 </p>
 
+> Till now, we have completed all preparations for Lab 1B.
+
+# Lab 1B
+
+---
+
+## Tasks 1: send and receive string
+Activate the virtual environment and start Jupyter Lab. In ble_arduino.ino, locate case ECHO: and observe that the text sent from Python is already stored in char_arr. By adding Serial.print / Serial.println, the goal could be easily achieved. Then, rerun Prelab Step 20 in demo.ipynb to reconnect to the Artemis board. Finally, run
+
+    ```python
+    ble.send_command(CMD.ECHO, "HIHELLO")
+    ```
+
+in **demo.ipynb; you should see the output in the Arduino IDE Serial Monitor.**
+
+<p align="center">
+  <img src="images/lab1/19.png" width="400">
+</p>
+
+---
+
+## Tasks 2: SEND_THREE_FLOATS
+Look at case SEND_TWO_INTS:; this makes it easy to understand how to write SEND_THREE_FLOATS. The only difference is that the local variables we define should be float instead of int. Finally, reconnect to the Artemis board， and run
+
+    ```python
+    ble.send_command(CMD.SEND_THREE_FLOATS, "2.2|3.3|4.4")
+    ```
+
+You can use any three floats you like. you should see the output in the Arduino IDE Serial Monitor.
+
+<p align="center">
+  <img src="images/lab1/20.png" width="400">
+</p>
+
+---
+
+## Tasks 3: GET_TIME_MILLIS
+Note that neither cmd_types.py nor ble_arduino.ino currently include the GET_TIME_MILLIS command type. To simplify future steps (after Lab 1B), we create the needed commands all at once.  
+
+In cmd_types.py, add three lines:
+
+    ```python
+    GET_TIME_MILLIS = 6
+    SEND_TIME_DATA = 7
+    GET_TEMP_READINGS = 8
+    ```
+
+<p align="center">
+  <img src="images/lab1/21.png" width="400">
+</p>
+
+In ble_arduino.ino, locate the enum CommandTypes and add:
+
+    ```cpp
+    GET_TIME_MILLIS,
+    SEND_TIME_DATA,
+    GET_TEMP_READINGS,
+    ```
+
+<p align="center">
+  <img src="images/lab1/22.png" width="400">
+</p>
+
+Be careful: the order is very important. The numbers in cmd_types.py must match the positions in ble_arduino.ino.
+
+now we define GET_TIME_MILLIS inside the switch (cmd_type) {}.  
+In case PING, you can see the code pattern to use and call millis(). Following this makes it easy to implement GET_TIME_MILLIS.
+
+Upload and reconnect, in demo.ipynb, create a new cell block and enter
+
+    ```python
+    ble.send_command(CMD.GET_TIME_MILLIS, "")
+    s = ble.receive_string(ble.uuid['RX_STRING'])
+    print(s)
+    ```
+
+Run this code block and you should see
+
+<p align="center">
+  <img src="images/lab1/23.png" width="400">
+</p>
+
+---
+
+## Tasks 4: notification handler
+In demo.ipynb, create a function (I used notification_handler) that uses string.split()[ ] to extract everything after the ":". Then create a code block like this to call GET_TIME_MILLIS and use the handler to get the time since boot
+
+<p align="center">
+  <img src="images/lab1/24.png" width="400">
+</p>
+
+---
+
+## Tasks 5: data-rate test
+In demo.ipynb, create a new code block. Since we already import time at the top, we can use it as a timer. During the timing period, repeatedly call GET_TIME_MILLIS and use the handler to get the time. Store all the retrieved time values in a list.
+
+<p align="center">
+  <img src="images/lab1/25.png" width="400">
+</p>
+
+---
+
+## Task 6: batched data transfer
+We have already defined case SEND_TIME_DATA in Task 3; now we define it directly inside the switch (cmd_type) {}.but leave it empty for now
+
+In the Global Variables section, define unsigned long time_stamps[reasonable_length] and a timer index variable int time_idx = 0;. In loop(), locate the while (central.connected()) {} — this loop runs after the Python side connects. Inside it, add an if statement: if time_idx is less than your chosen time_stamps length, write to time_stamps[time_idx] and increment time_idx. Otherwise, enter a secondary for loop (for (int i = 1; i < reasonable_length; i++)) to shift the entire array left by one. After the loop, the last element is free, so write the latest millis() there.
+
+You might notice that here I’m using a sliding window. For example, if we didn’t do this and simply reset time_idx, the time stamps [1,2,3,4,5] could become [6,7,8,4,5] after three updates, instead of [4,5,6,7,8].  
+Now let’s go back to case SEND_TIME_DATA. In this logic, we create a char array to hold the current values from time_stamps and concatenate them with commas. We need to check if the char array has enough space before adding the next time stamp — if there isn’t enough space, we stop adding more. Then we use tx_estring_value.append to build the string and send it.  
+Back in JupyterLab, we can now time the call to SEND_TIME_DATA and receive a string in the format:  
+fitst time stamp,...,last time stamp or fitst time stamp,...,last time stamp,
+
+<p align="center">
+  <img src="images/lab1/26.png" width="400">
+</p>
+
+---
+
+## Task 7: adding temperature to the array
+In the Global Variables section, create unsigned long temp_readings with the same length as time_stamps.  
+In while (central.connected()) {}, add temp_readings[time_idx] = getTempDegF() using the sliding window logic — basically, right after time_stamps[time_idx] = millis(), add temp_readings[time_idx] = getTempDegF().  
+Then look at case GET_TEMP_READINGS. It is similar to SEND_TIME_DATA, except that we send:  
+first time stamp:first temp reading,...,last time stamp:last temp reading
+
+Note that the string may still have a trailing comma. Use an appropriate method to extract each "time stamp:temp reading" pair, and then use the notification handler to store the timestamps and temperature readings separately into two arrays.
+
+<p align="center">
+  <img src="images/lab1/27.png" width="400">
+</p>
+
+---
+
+## Task 8: Discuss data transferring methods
+By comparing the single time stamp transfer rate of 4.2/sec in Task 5 with the array of time stamps transfer rate of 57.76/sec in Task 6, we can see that the batched data transfer rate is much higher than sending individual time stamps.
+
+This is because each time a time stamp is sent, BLE has to perform a GATT write/notify operation. By sending multiple time stamps at once, the time cost is spread across more data, significantly reducing the “per time stamp” cost.
+
+---
+
+## Discussion
+In Lab 1A, we mainly installed the SparkFun Apollo drivers and became familiar with the basic operations of the Arduino IDE, including understanding the serial monitor and baud rate. In Lab 1B, we performed simple BLE communication between Python and the board, and learned that each GATT write/notify has a fixed overhead, so sending data in batches can spread the overhead across more data, thereby increasing the transfer rate.
+
