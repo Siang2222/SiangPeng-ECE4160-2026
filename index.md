@@ -445,6 +445,92 @@ In Lab 1A, we mainly installed the SparkFun Apollo drivers and became familiar w
 
 </div>
 
+
+
+# Lab 2: IMU Setup and Testing {#lab2}
+
+## Set up the IMU
+In Lab 2, I first connected the IMU to the Artemis Nano. The connection is shown below:
+
+![IMU connection placeholder](images/lab2/imu_connection.jpg)
+
+Using the example code from the **ICM20948 library**, the IMU runs correctly, as shown here:
+
+![Example code output placeholder](images/lab2/example_output.jpg)
+
+The `AD0_VAL` pin determines the I2C address. When multiple identical devices are connected to the same I2C bus, this value must be modified to differentiate the hardware.
+
+The current example code output does not give the angles we expect. To compute the proper angles, we need to use formulas mentioned in lecture. The original output is also hard to read; rapid numeric updates make trends difficult to observe. Therefore, I modified the data output format so it can be visualized with the **Serial Plotter**, which also helps with tuning the low-pass filter.  
+
+Additionally, to easily check if the IMU is running, I set the **built-in blue LED** to stay on.
+
+---
+
+## Accelerometer
+
+The formulas to compute pitch and roll from the accelerometer readings are:
+
+\[
+\text{Pitch} = \arctan2(a_x, a_z) \times \frac{180}{\pi}
+\]  
+\[
+\text{Roll} = \arctan2(a_y, a_z) \times \frac{180}{\pi}
+\]
+
+Since gravity is always vertical, the accelerometer cannot measure yaw.  
+
+For testing purposes, I output the calculated pitch/roll in `pitch,roll` format so it can be observed in the Serial Plotter. I tilted the IMU along the +pitch and +roll directions and observed the following:
+
+![Pitch/Roll visualization placeholder](images/lab2/pitch_roll_plot.jpg)
+
+---
+
+## Quantifying Accelerometer Accuracy
+
+I modeled the accelerometer measurement as:
+
+\[
+\text{Measured value} = \text{Scale factor} \times \text{True value} + \text{Bias}
+\]
+
+Using the IMU’s raw ADC output range (e.g., ±32768 corresponding to ±1g):
+
+1. Place the IMU stationary with **+Z upward**, measure for a period, and record the average as `az_pos`.
+2. Place the IMU with **+Z downward**, measure for a period, and record the average as `az_neg`.
+
+The **bias** is then:
+
+\[
+b = \frac{az\_pos + az\_neg}{2}
+\]
+
+The **scale factor** is:
+
+\[
+S = \frac{32768}{az\_pos - az\_neg}
+\]
+
+These values quantify the accelerometer’s systematic error and measurement accuracy. The computed scale factor and bias are shown below:
+
+![Scale factor and bias placeholder](images/lab2/scale_bias.jpg)
+
+The errors are small enough that I did not apply scaling or bias correction to the accelerometer readings.
+
+---
+
+## Frequency Analysis and Low-Pass Filter Design
+
+I manually extracted a segment of the IMU jitter from the Serial Monitor and created a Python script to analyze its frequency domain. Using 95% of the signal energy as the cutoff frequency, I obtained the following:
+
+![Frequency analysis placeholder 1](images/lab2/freq_analysis1.jpg)  
+![Frequency analysis placeholder 2](images/lab2/freq_analysis2.jpg)  
+![Frequency analysis placeholder 3](images/lab2/freq_analysis3.jpg)
+
+Using these three cutoff frequencies, I designed a low-pass filter for the accelerometer. Testing with 90% energy as cutoff still showed noticeable noise in the Serial Plotter. Using 95% energy produced good results.  
+
+In the plot below, the **blue line** is the filtered accelerometer data, and the **orange line** is unfiltered:
+
+![Filtered vs unfiltered accelerometer data placeholder](images/lab2/filter_comparison.jpg)
 <div style="text-align:center; font-weight:bold; padding:20px; background-color:#fff3cd; border:1px solid #ffeeba; border-radius:5px;">
 LAB1 content is currently being updated based on feedback and will be published again shortly.
 </div>
