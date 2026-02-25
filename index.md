@@ -444,6 +444,14 @@ This is because each time a time stamp is sent, BLE has to perform a GATT write/
 In Lab 1A, we mainly installed the SparkFun Apollo drivers and became familiar with the basic operations of the Arduino IDE, including understanding the serial monitor and baud rate. In Lab 1B, we performed simple BLE communication between Python and the board, and learned that each GATT write/notify has a fixed overhead, so sending data in batches can spread the overhead across more data, thereby increasing the transfer rate.
 
 </div>
+<div style="text-align:center; font-weight:bold; padding:20px; background-color:#fff3cd; border:1px solid #ffeeba; border-radius:5px;">
+LAB1 content is currently being updated based on feedback and will be published again shortly.
+</div>
+
+
+
+
+
 
 
 
@@ -531,6 +539,3 @@ Using these three cutoff frequencies, I designed a low-pass filter for the accel
 In the plot below, the **blue line** is the filtered accelerometer data, and the **orange line** is unfiltered:
 
 ![Filtered vs unfiltered accelerometer data placeholder](images/lab2/filter_comparison.jpg)
-<div style="text-align:center; font-weight:bold; padding:20px; background-color:#fff3cd; border:1px solid #ffeeba; border-radius:5px;">
-LAB1 content is currently being updated based on feedback and will be published again shortly.
-</div>
